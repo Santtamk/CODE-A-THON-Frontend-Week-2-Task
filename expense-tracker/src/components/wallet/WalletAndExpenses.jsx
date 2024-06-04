@@ -1,6 +1,6 @@
 import { PropTypes } from "prop-types"
 
-const Wallet = ({ amount,color,buttonText,title,toggleForm }) => {
+const Wallet = ({ amount, color, buttonText, title, toggleForm }) => {
 
   return (
     <div>
