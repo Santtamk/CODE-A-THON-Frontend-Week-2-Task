@@ -1,23 +1,21 @@
 import { PropTypes } from "prop-types"
 
-const Wallet = ({ amount, color, buttonText, title, toggleForm }) => {
+const WalletAndExpenses = ({ amount, color, buttonText, title, toggleForm }) => {
 
   return (
     <div>
-        <div>{title}:
-            ₹{amount}
-            </div>
+        <div>{title}:₹{amount}</div>
         <button style={{ backgroundColor: color }} onClick={toggleForm}> {buttonText} </button>
     </div>
   )
 }
 
-Wallet.propTypes = {
+WalletAndExpenses.propTypes = {
     title: PropTypes.string.isRequired,
-    amount: PropTypes.number.isRequired,
+    amount: PropTypes.number,
     color: PropTypes.string.isRequired,
     buttonText: PropTypes.string.isRequired,
     toggleForm: PropTypes.func,
 }
 
-export default Wallet
+export default WalletAndExpenses

@@ -1,6 +1,16 @@
 import { useEffect, useState } from "react";
+import { SnackbarProvider, enqueueSnackbar } from "notistack";
 import "./App.css";
-import Wallet from "./components/wallet/WalletAndExpenses";
+import WalletForm from "./components/forms/WalletForm";
+import ExpenseForm from "./components/forms/ExpenseForm";
+import WalletAndExpenses from "./components/wallet/WalletAndExpenses";
+import ExpensesPieChart from "./components/charts/ExpensePieChart.jsx";
+// import  { PureComponent } from 'react';
+// import { PieChart, Pie, Sector, Cell, ResponsiveContainer } from 'recharts';
+// import ExpenseForm from "./components/forms/WalletForm";
+
+// // fpr pichart
+// const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 function App() {
   //balance update
@@ -17,30 +27,14 @@ function App() {
   const [expenses, setExpenses] = useState(() => {
     try {
       const savedExpenses = localStorage.getItem("expenses");
-      return savedExpenses !== null
-        ? JSON.parse(savedExpenses)
-        : [
-            // {
-            //   title: "",
-            //   price: 0,
-            //   category: "",
-            //   date: "",
-            // },
-          ];
+      return savedExpenses !== null ? JSON.parse(savedExpenses) : [];
     } catch (e) {
       console.error("this is the error message on expense", e);
-      return [
-        // {
-        //   title: "",
-        //   price: 0,
-        //   category: "",
-        //   date: "",
-        // },
-      ];
+      return [];
     }
   });
-  
-  //state of the wallet & expense value in form 
+
+  //state of the wallet & expense value in form
   const [addingToWallet, setAddingToWallet] = useState(0);
   const [expenseFormData, setExpenseFormData] = useState({
     title: "",
@@ -52,7 +46,9 @@ function App() {
   //form toggle state change
   const [showIncomeForm, setShowIncomeForm] = useState(false);
   const [showExpenseForm, setShowExpenseForm] = useState(false);
+  const [totalExpenses, setTotalExpenses] = useState();
 
+  // const { enqueueSnackbar, closeSnackbar } = useSnackbar()
 
   useEffect(() => {
     localStorage.setItem("balance", JSON.stringify(balance));
@@ -85,41 +81,48 @@ function App() {
     toggleBalanceForm();
   };
 
+  useEffect(() => {
+    setTotalExpenses(
+      expenses.reduce((total, expense) => total + expense.price, 0)
+    );
+  }, [expenses]);
+
+
   const addExpense = (e) => {
     e.preventDefault();
 
-    //form data 
-    // const title = e.target[0].value;
-    // const price = parseFloat(e.target[1].value);
-    // const category = e.target[2].value;
-    // const date = e.target[3].value;
+    //form data
     const title = expenseFormData.title;
     const price = parseFloat(expenseFormData.price);
     const category = expenseFormData.category;
     const date = expenseFormData.date;
 
     // Check if all form fields are filled
-  if (!title || isNaN(price) || !category || !date) {
-    // Display an error message or handle invalid form data
-    alert("Please fill in all fields");
-    return;
-  }
+    if (!title || isNaN(price) || !category || !date) {
+      // Display an error message or handle invalid form data
+      enqueueSnackbar("Please fill in all fields", { variant: "error" });
+      return;
+    }
 
+    // Check if the expense is greater than the balance
+    const newTotalExpenses = totalExpenses + price;
+    if (newTotalExpenses > balance) {
+      enqueueSnackbar("Your expense is greater than your balance", {
+        variant: "error",
+      });
+      return;
+    }
     //new expense object
     const newExpense = {
-      // title: expenseFormData.title,
-      // price: parseFloat(expenseFormData.price),
-      // category: expenseFormData.category,
-      // date: expenseFormData.date,
       title,
       price,
       category,
       date,
     };
-    
+
     //expense state
-    setExpenses((prevExpenses) => [...prevExpenses, newExpense])
-    
+    setExpenses((prevExpenses) => [...prevExpenses, newExpense]);
+
     //reset form fields
     e.target.reset();
 
@@ -138,93 +141,51 @@ function App() {
     setBalance(5000);
     setExpenses([]);
     //clear local storage
-    localStorage.removeItem('balance');
-    localStorage.removeItem('expenses');
-  }
+    localStorage.removeItem("balance");
+    localStorage.removeItem("expenses");
+  };
 
   return (
     <>
-      <div>
-        <h1>Expense Tracker</h1>
+      <SnackbarProvider maxSnack={3}>
         <div>
-          <Wallet
-            title="Wallet Balance"
-            amount={balance}
-            color="green"
-            buttonText="+ Add Income"
-            toggleForm={toggleBalanceForm}
-          />
-          <Wallet
-            title="Expenses"
-            amount={500}
-            color="red"
-            buttonText="+ Add Expense"
-            toggleForm={toggleExpensesForm}
-          />
-          {/* <ExpensesChart /> */}
+          <h1>Expense Tracker</h1>
+          <div>
+            <WalletAndExpenses
+              title="Wallet Balance"
+              amount={balance}
+              color="green"
+              buttonText="+ Add Income"
+              toggleForm={toggleBalanceForm}
+            />
+            <WalletAndExpenses
+              title="Expenses"
+              amount={totalExpenses}
+              color="red"
+              buttonText="+ Add Expense"
+              toggleForm={toggleExpensesForm}
+            />
+          </div>
+          <div>
+            {showIncomeForm && (
+              <WalletForm
+                addBalance={addBalance}
+                setAddingToWallet={setAddingToWallet}
+                toggleBalanceForm={toggleBalanceForm}
+              />
+            )}
+            {showExpenseForm && (
+              <ExpenseForm
+                addExpense={addExpense}
+                expenseFormData={expenseFormData}
+                handleInputChange={handleInputChange}
+                toggleExpensesForm={toggleExpensesForm}
+              />
+            )}
+          </div>
+          <ExpensesPieChart expenses={expenses} />
         </div>
-        <div>
-          {showIncomeForm && (
-            <form onSubmit={addBalance}>
-              <h3>Add Balance</h3>
-              <input
-                type="number"
-                onChange={(e) =>
-                  setAddingToWallet(parseInt(e.target.value, 10))
-                }
-                // value={addingToWallet}
-                placeholder="Income Amount"
-                required
-              />
-              <input type="submit" value="Add Balance" />
-              <button onClick={toggleBalanceForm}>Cancel</button>
-            </form>
-          )}
-          {showExpenseForm && (
-            <form onSubmit={addExpense}>
-              <h3>Add Expenses</h3>
-              <input 
-                type="text" 
-                name="title"
-                placeholder="Title" 
-                value={expenseFormData.title}
-                onChange={handleInputChange} 
-                required 
-              />
-              <input 
-                type="number" 
-                placeholder="Price" 
-                name="price"
-                value={expenseFormData.price}
-                onChange={handleInputChange}
-                required 
-              />
-                <select 
-                  name="category" 
-                  id="categories" 
-                  value={expenseFormData.category}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="" disabled hidden>Select Category</option>
-                  <option value="Food">Food</option>
-                  <option value="Entertainment">Entertainment</option>
-                  <option value="Travel">Travel</option>
-                </select>
-              <input 
-                type="date" 
-                name="date"
-                placeholder="dd/mm/yyyy" 
-                value={expenseFormData.date}
-                onChange={handleInputChange}
-                required 
-              />
-              <input type="submit" value="Add Expense" />
-              <button onClick={toggleExpensesForm}>Cancel</button>
-            </form>
-          )}
-        </div>
-      </div>
+      </SnackbarProvider>
       <button onClick={clearAll}>Clear All</button>
     </>
   );
