@@ -150,41 +150,42 @@ function App() {
       <SnackbarProvider maxSnack={3}>
         <div>
           <h1>Expense Tracker</h1>
-          <div>
-            <WalletAndExpenses
-              title="Wallet Balance"
-              amount={balance}
-              color="green"
-              buttonText="+ Add Income"
-              toggleForm={toggleBalanceForm}
-            />
-            <WalletAndExpenses
-              title="Expenses"
-              amount={totalExpenses}
-              color="red"
-              buttonText="+ Add Expense"
-              toggleForm={toggleExpensesForm}
-            />
-          </div>
-          <div>
-            {showIncomeForm && (
-              <WalletForm
-                addBalance={addBalance}
-                setAddingToWallet={setAddingToWallet}
-                toggleBalanceForm={toggleBalanceForm}
+            <div className="top_add">
+              <WalletAndExpenses
+                title="Wallet Balance"
+                amount={balance}
+                color="green"
+                buttonText="+ Add Income"
+                toggleForm={toggleBalanceForm}
               />
-            )}
-            {showExpenseForm && (
-              <ExpenseForm
-                addExpense={addExpense}
-                expenseFormData={expenseFormData}
-                handleInputChange={handleInputChange}
-                toggleExpensesForm={toggleExpensesForm}
+              <WalletAndExpenses
+                title="Expenses"
+                amount={totalExpenses}
+                color="red"
+                buttonText="+ Add Expense"
+                toggleForm={toggleExpensesForm}
               />
-            )}
+              <ExpensesPieChart expenses={expenses} />
+            </div>
+            <div>
+              {showIncomeForm && (
+                <WalletForm
+                  addBalance={addBalance}
+                  setAddingToWallet={setAddingToWallet}
+                  toggleBalanceForm={toggleBalanceForm}
+                />
+              )}
+              {showExpenseForm && (
+                <ExpenseForm
+                  addExpense={addExpense}
+                  expenseFormData={expenseFormData}
+                  handleInputChange={handleInputChange}
+                  toggleExpensesForm={toggleExpensesForm}
+                />
+              )}
+            </div>
           </div>
-          <ExpensesPieChart expenses={expenses} />
-        </div>
+          {/* top body ends here */}
       </SnackbarProvider>
       <button onClick={clearAll}>Clear All</button>
     </>

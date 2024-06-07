@@ -1,4 +1,4 @@
-
+import { PropTypes } from "prop-types"
 import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
 
 const COLORS = ['#A000FF', '#FF9304', '#FDE006'];
@@ -28,12 +28,9 @@ function ExpensesPieChart({ expenses }) {
     return acc;
   }, []);
 
-  // const totalExpenses = data.reduce((total, item) => total + item.value, 0);
-
   return (
     <div>
       <h3>Expenses Chart</h3>
-      {/* <ResponsiveContainer width="100%" height="100%"> */}
       <PieChart width={400} height={400}>
         <Pie
           data={data}
@@ -53,9 +50,12 @@ function ExpensesPieChart({ expenses }) {
         <Tooltip />
         <Legend />
       </PieChart>
-      {/* </ResponsiveContainer> */}
     </div>
   );
+}
+
+ExpensesPieChart.prototype = {
+  expenses: PropTypes.func
 }
 
 export default ExpensesPieChart;

@@ -6,4 +6,13 @@ h1{
   color: #FFFFFF;
 }
 
-
+.top{
+  background: #626262;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.top_add{
+  display: flex;
+  justify-content: space-between;
+}
