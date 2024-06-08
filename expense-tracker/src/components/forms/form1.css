@@ -124,3 +124,16 @@ button:focus {
     color: #000000;
   }
 
+    @media screen and (max-width:550px) {
+      .form1-content{
+        max-width: 280px;
+        height: 500px;
+      }
+      .form1-content_div {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+    }
+  
+

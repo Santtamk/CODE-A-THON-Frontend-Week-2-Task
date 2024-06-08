@@ -1,11 +1,12 @@
 import { PropTypes } from "prop-types"
+import './WalletAndExpenses.css';
 
-const WalletAndExpenses = ({ amount, color, buttonText, title, toggleForm }) => {
+const WalletAndExpenses = ({ amount, color, buttonText, title, toggleForm, backgroundColor }) => {
 
   return (
-    <div>
-        <div>{title}:₹{amount}</div>
-        <button style={{ backgroundColor: color }} onClick={toggleForm}> {buttonText} </button>
+    <div className="card">
+        <div>{title}:<span style={{ color: color }}>₹{amount}</span></div>
+        <button style={{ background: backgroundColor }} onClick={toggleForm}> {buttonText} </button>
     </div>
   )
 }
@@ -14,6 +15,7 @@ WalletAndExpenses.propTypes = {
     title: PropTypes.string.isRequired,
     amount: PropTypes.number,
     color: PropTypes.string.isRequired,
+    backgroundColor: PropTypes.string.isRequired,
     buttonText: PropTypes.string.isRequired,
     toggleForm: PropTypes.func,
 }

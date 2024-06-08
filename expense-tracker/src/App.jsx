@@ -5,12 +5,10 @@ import WalletForm from "./components/forms/WalletForm";
 import ExpenseForm from "./components/forms/ExpenseForm";
 import WalletAndExpenses from "./components/wallet/WalletAndExpenses";
 import ExpensesPieChart from "./components/charts/ExpensePieChart.jsx";
-// import  { PureComponent } from 'react';
-// import { PieChart, Pie, Sector, Cell, ResponsiveContainer } from 'recharts';
-// import ExpenseForm from "./components/forms/WalletForm";
 
-// // fpr pichart
-// const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+import { v4 as uuidv4 } from 'uuid';
+import RecentTranscations from "./components/transactions/RecentTranscations.jsx";
+
 
 function App() {
   //balance update
@@ -37,6 +35,7 @@ function App() {
   //state of the wallet & expense value in form
   const [addingToWallet, setAddingToWallet] = useState(0);
   const [expenseFormData, setExpenseFormData] = useState({
+    id:"",
     title: "",
     price: "",
     category: "",
@@ -48,7 +47,7 @@ function App() {
   const [showExpenseForm, setShowExpenseForm] = useState(false);
   const [totalExpenses, setTotalExpenses] = useState();
 
-  // const { enqueueSnackbar, closeSnackbar } = useSnackbar()
+  
 
   useEffect(() => {
     localStorage.setItem("balance", JSON.stringify(balance));
@@ -87,7 +86,6 @@ function App() {
     );
   }, [expenses]);
 
-
   const addExpense = (e) => {
     e.preventDefault();
 
@@ -114,6 +112,7 @@ function App() {
     }
     //new expense object
     const newExpense = {
+      id: uuidv4(),
       title,
       price,
       category,
@@ -127,6 +126,7 @@ function App() {
     e.target.reset();
 
     setExpenseFormData({
+      id:"",
       title: "",
       price: "",
       category: "",
@@ -145,49 +145,67 @@ function App() {
     localStorage.removeItem("expenses");
   };
 
+  const deleteExpense = (id) => {
+    const newExpenses = expenses.filter((expense) => expense.id !== id);
+    setExpenses(newExpenses);
+  };
+
+  const editExpense = (id) => {
+    const findExpense = expenses.find((expense) => expense.id === id);
+    setExpenseFormData(findExpense)
+    toggleExpensesForm()
+    const newExpenses = expenses.filter((expense) => expense.id !== id);
+    setExpenses(newExpenses);
+  }
+
   return (
     <>
       <SnackbarProvider maxSnack={3}>
         <div>
           <h1>Expense Tracker</h1>
-            <div className="top_add">
-              <WalletAndExpenses
-                title="Wallet Balance"
-                amount={balance}
-                color="green"
-                buttonText="+ Add Income"
-                toggleForm={toggleBalanceForm}
-              />
-              <WalletAndExpenses
-                title="Expenses"
-                amount={totalExpenses}
-                color="red"
-                buttonText="+ Add Expense"
-                toggleForm={toggleExpensesForm}
-              />
-              <ExpensesPieChart expenses={expenses} />
-            </div>
-            <div>
-              {showIncomeForm && (
-                <WalletForm
-                  addBalance={addBalance}
-                  setAddingToWallet={setAddingToWallet}
-                  toggleBalanceForm={toggleBalanceForm}
-                />
-              )}
-              {showExpenseForm && (
-                <ExpenseForm
-                  addExpense={addExpense}
-                  expenseFormData={expenseFormData}
-                  handleInputChange={handleInputChange}
-                  toggleExpensesForm={toggleExpensesForm}
-                />
-              )}
-            </div>
+          <div className="top_add">
+            <WalletAndExpenses
+              title="Wallet Balance"
+              amount={balance}
+              color="#9DFF5B"
+              backgroundColor="linear-gradient(90deg, #B5DC52 0%, #89E148 100%)"
+              buttonText="+ Add Income"
+              toggleForm={toggleBalanceForm}
+            />
+            <WalletAndExpenses
+              title="Expenses"
+              amount={totalExpenses}
+              color="#F4BB4A"
+              backgroundColor="linear-gradient(90deg, #FF9595 0%, #FF4747 80%, #FF3838 100%)"
+              buttonText="+ Add Expense"
+              toggleForm={toggleExpensesForm}
+            />
+            <ExpensesPieChart expenses={expenses} />
           </div>
-          {/* top body ends here */}
+          <div>
+            {showIncomeForm && (
+              <WalletForm
+                addBalance={addBalance}
+                setAddingToWallet={setAddingToWallet}
+                toggleBalanceForm={toggleBalanceForm}
+              />
+            )}
+            {showExpenseForm && (
+              <ExpenseForm
+                addExpense={addExpense}
+                expenseFormData={expenseFormData}
+                handleInputChange={handleInputChange}
+                toggleExpensesForm={toggleExpensesForm}
+              />
+            )}
+          </div>
+        </div>
+        {/* top body ends here */}
       </SnackbarProvider>
       <button onClick={clearAll}>Clear All</button>
+      <div>
+        <RecentTranscations  expenses={expenses} deleteExpense={deleteExpense} editExpense={editExpense } />
+      </div>
     </>
   );
 }

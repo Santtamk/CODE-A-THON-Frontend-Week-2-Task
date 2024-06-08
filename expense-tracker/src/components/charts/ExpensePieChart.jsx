@@ -1,5 +1,6 @@
 import { PropTypes } from "prop-types"
 import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
+import './ExpensePieChart.css'
 
 const COLORS = ['#A000FF', '#FF9304', '#FDE006'];
 
@@ -28,10 +29,23 @@ function ExpensesPieChart({ expenses }) {
     return acc;
   }, []);
 
+  const renderLegend = (props) => {
+    const { payload } = props;
+    return (
+      <ul className="custom-legend">
+        {payload.map((entry, index) => (
+          <li key={`item-${index}`} style={{ color: COLORS[index % COLORS.length] }}>
+            <span className="legend-color-box" style={{ backgroundColor: COLORS[index % COLORS.length] }}></span>
+            <span className="legend-color-font">{entry.value}</span>
+          </li>
+        ))}
+      </ul>
+    );
+  };
+
   return (
-    <div>
-      <h3>Expenses Chart</h3>
-      <PieChart width={400} height={400}>
+    <div className="pieChart">
+      <PieChart width={250} height={250}>
         <Pie
           data={data}
           dataKey="value"
@@ -39,23 +53,28 @@ function ExpensesPieChart({ expenses }) {
           cx="50%"
           cy="50%"
           labelLine={false}
-          outerRadius={150}
+          outerRadius={80}
           fill="#8884d8"
           label={renderCustomizedLabel}
         >
-          {data.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-          ))}
+            {data.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]}/>
+            ))}
         </Pie>
         <Tooltip />
-        <Legend />
+        <Legend content={renderLegend} />
       </PieChart>
     </div>
   );
 }
 
-ExpensesPieChart.prototype = {
-  expenses: PropTypes.func
-}
+ExpensesPieChart.propTypes = {
+  expenses: PropTypes.arrayOf(
+    PropTypes.shape({
+      category: PropTypes.string.isRequired,
+      price: PropTypes.number.isRequired
+    })
+  ).isRequired
+};
 
 export default ExpensesPieChart;

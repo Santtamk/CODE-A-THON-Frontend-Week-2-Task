@@ -112,3 +112,21 @@ button:focus {
     color: #000000;
   }
 
+@media screen and (max-width:550px) {
+  .form-content{
+    max-width: 280px;
+    height: 260px;
+  }
+  .form-content_div {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .form-content_input{
+    width: 240px !important;
+  }
+  .form-content_cancel{
+    width: 240px !important;
+  }
+}
+
