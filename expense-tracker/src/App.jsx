@@ -61,7 +61,7 @@ function App() {
       [name]: value,
     }));
   };
-
+  
   const toggleBalanceForm = () => {
     setShowIncomeForm(!showIncomeForm);
     if (showExpenseForm) setShowIncomeForm(false);
@@ -70,6 +70,13 @@ function App() {
   const toggleExpensesForm = () => {
     setShowExpenseForm(!showExpenseForm);
     if (showIncomeForm) setShowExpenseForm(false);
+    setExpenseFormData({
+      id: "",
+      title: "",
+      price: "",
+      category: "",
+      date: "",
+    });
   };
 
   const addBalance = (e) => {
@@ -90,17 +97,13 @@ function App() {
     e.preventDefault();
 
     //form data
+    const id = expenseFormData.id; 
     const title = expenseFormData.title;
     const price = parseFloat(expenseFormData.price);
     const category = expenseFormData.category;
     const date = expenseFormData.date;
 
-    // Check if all form fields are filled
-    if (!title || isNaN(price) || !category || !date) {
-      // Display an error message or handle invalid form data
-      enqueueSnackbar("Please fill in all fields", { variant: "error" });
-      return;
-    }
+    const parsedDate = new Date(date).toDateString();
 
     // Check if the expense is greater than the balance
     const newTotalExpenses = totalExpenses + price;
@@ -110,21 +113,26 @@ function App() {
       });
       return;
     }
-    //new expense object
-    const newExpense = {
-      id: uuidv4(),
-      title,
-      price,
-      category,
-      date,
-    };
-
-    //expense state
-    setExpenses((prevExpenses) => [...prevExpenses, newExpense]);
+    
+    if (id) {
+      // Edit existing expense
+      const updatedExpenses = expenses.map((expense) =>
+        expense.id === id ? { ...expense, title, price, category, date } : expense
+      );
+      setExpenses(updatedExpenses);
+    } else {
+      // Add new expense
+      const newExpense = {
+        id: uuidv4(),
+        title,
+        price,
+        category,
+        date:parsedDate,
+      };
+      setExpenses((prevExpenses) => [...prevExpenses, newExpense]);
+    }
 
     //reset form fields
-    e.target.reset();
-
     setExpenseFormData({
       id:"",
       title: "",
@@ -151,11 +159,9 @@ function App() {
   };
 
   const editExpense = (id) => {
+    toggleExpensesForm()
     const findExpense = expenses.find((expense) => expense.id === id);
     setExpenseFormData(findExpense)
-    toggleExpensesForm()
-    const newExpenses = expenses.filter((expense) => expense.id !== id);
-    setExpenses(newExpenses);
   }
 
   return (
