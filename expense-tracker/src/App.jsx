@@ -8,6 +8,7 @@ import ExpensesPieChart from "./components/charts/ExpensePieChart.jsx";
 
 import { v4 as uuidv4 } from 'uuid';
 import RecentTranscations from "./components/transactions/RecentTranscations.jsx";
+import TopExpenses from "./components/topexpenses/TopExpenses.jsx";
 
 
 function App() {
@@ -209,8 +210,13 @@ function App() {
         {/* top body ends here */}
       </SnackbarProvider>
       <button onClick={clearAll}>Clear All</button>
-      <div>
-        <RecentTranscations  expenses={expenses} deleteExpense={deleteExpense} editExpense={editExpense } />
+      <div className="second-body">
+        <div>
+          <RecentTranscations  expenses={expenses} deleteExpense={deleteExpense} editExpense={editExpense } />
+        </div>
+        <div>
+          <TopExpenses expenses={expenses}/>
+        </div>
       </div>
     </>
   );

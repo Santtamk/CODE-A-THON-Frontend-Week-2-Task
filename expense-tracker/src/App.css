@@ -33,6 +33,9 @@ h1{
   padding-bottom: 4rem;
 }
 
+.second-body{
+  display: flex;
+}
 @media screen and (max-width:800px) {
   .top_add{
     flex-direction: column;
