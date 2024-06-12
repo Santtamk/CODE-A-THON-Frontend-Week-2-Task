@@ -1,68 +1,56 @@
-import React from 'react';
-import ReactApexChart from 'react-apexcharts';
+import './TopExpenses.css';
+const TopExpenses = ({ expenses }) => {
+  const processExpenses = () => {
+    let entertainmentTotal = 0;
+    let foodTotal = 0;
+    let travelTotal = 0;
 
-class TopExpenses extends React.Component {
-  constructor(props) {
-    super(props);
-
-    // Process expenses to get the data for the chart
-    const data = this.processExpenses(props.expenses);
-
-    this.state = {
-      series: [{
-        data: data.values
-      }],
-      options: {
-        chart: {
-          type: 'bar',
-          height: 350
-        },
-        plotOptions: {
-          bar: {
-            borderRadius: 4,
-            horizontal: true,
-          }
-        },
-        dataLabels: {
-          enabled: false
-        },
-        xaxis: {
-          categories: data.categories,
-        }
+    expenses.forEach(expense => {
+      if (expense.category === 'Entertainment') {
+        entertainmentTotal += expense.price;
+      } else if (expense.category === 'Food') {
+        foodTotal += expense.price;
+      } else if (expense.category === 'Travel') {
+        travelTotal += expense.price;
       }
-    };
-  }
+    });
 
-  processExpenses(expenses) {
-    // Reduce expenses to get total value for each category
-    const processedData = expenses.reduce((acc, expense) => {
-      const found = acc.find(item => item.category === expense.category);
-      if (found) {
-        found.value += expense.price;
-      } else {
-        acc.push({ category: expense.category, value: expense.price });
-      }
-      return acc;
-    }, []);
+    const categoryTotals = [
+      { category: 'Entertainment', total: entertainmentTotal },
+      { category: 'Food', total: foodTotal },
+      { category: 'Travel', total: travelTotal },
+    ];
 
-    // Extract categories and values for the chart
-    const categories = processedData.map(item => item.category);
-    const values = processedData.map(item => item.value);
+    categoryTotals.sort((a, b) => b.total - a.total);
 
-    return { categories, values };
-  }
+    return categoryTotals;
+  };
 
-  render() {
-    return (
-      <div>
-        <h2>Top Expenses</h2>
-        <div id="chart">
-          <ReactApexChart options={this.state.options} series={this.state.series} type="bar" height={350} />
+  const data = processExpenses();
+  const maxTotal = Math.max(...data.map(item => item.total));
+
+  return (
+    <div>
+      <h2>Top Expenses</h2>
+      <div className="chart-container">
+        <div className='category-labels'>
+            {data.map((item, index) => (
+                <div className="bar-label" key={index}>{item.category}</div>
+            ))}
+
         </div>
-        <div id="html-dist"></div>
+        <div className='bars'>
+            {data.map((item, index) => (
+                <div
+                key={index}
+                className="bar"
+                style={{ width: `${(item.total / maxTotal) * 100}%` }}
+                ></div>
+            ))}
+        </div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
 export default TopExpenses;
